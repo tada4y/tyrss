@@ -15,22 +15,74 @@ import {
 import { jsx, Global } from '@emotion/core';
 import { Store, Provider } from './store';
 import {
-    naviStyle, bodyStyle,
+    naviStyle,
+    containerStyle, 
+    contentStyle,
 } from './styles';
 
 const Home = () => {
     return (
-        <React.Fragment>
+        <div css={contentStyle}>
             <h2>Home</h2>
-        </React.Fragment>
+        </div>
     );
 };
 
 const Login = () => {
-    return (
-        <React.Fragment>
-            <h2>Login/Logout</h2>
+    const [name, setName] = useState('');
+    const [pass, setPass] = useState('');
+    const {state, dispatch} = useContext(Store);
+    const execLogin = () => {
+        const url = 'https://tyrssbackend.herokuapp.com/login';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            body: JSON.stringify({name, pass})
+        }).then((resp) => {
+            if (resp.status === 200) {
+                return resp.text();
+            } else {
+                throw new Error(resp.statusText);
+            }
+        }).then((text) => {
+            dispatch({type: 'setUser', payload: text});
+        }).catch((err) => console.error(err));
+    };
+    const execLogout = () => {
+        dispatch({type: 'setUser', payload: null});
+    };
+    let form = null;
+    if (state.user) {
+        form = <React.Fragment>
+            <p>
+                <button onClick={execLogout}>logout</button>
+            </p>
         </React.Fragment>
+    } else {
+        form = <React.Fragment>
+            <p>
+                <span>name</span><br/>
+                <input type="text" onChange={(ev) => {
+                    setName(ev.currentTarget.value);
+                }} value={name} />
+                <br/>
+                <span>password</span><br/>
+                <input type="password" onChange={(ev) => {
+                    setPass(ev.currentTarget.value);
+                }} value={pass} />
+            </p>
+            <p>
+                <button onClick={execLogin}>login</button>
+            </p>
+        </React.Fragment>
+    }
+    return (
+        <div css={contentStyle}>
+            <h2>Login/Logout</h2>
+            {form}
+        </div>
     );
 };
 
@@ -54,6 +106,7 @@ const Navi = () => {
             <li>
                 <Link to="/login">{login}</Link>
             </li>
+            <li></li>
         </ul>
     );
 };
@@ -62,8 +115,7 @@ const App = () => {
     return (
         <HashRouter>
             <Provider>
-                <React.Fragment>
-                    <Global styles={bodyStyle} />
+                <div css={containerStyle}>
                     <Navi />
                     <Switch>
                         <Route exact path="/">
@@ -73,18 +125,10 @@ const App = () => {
                             <Login />
                         </Route>
                     </Switch>
-                </React.Fragment>
+                </div>
             </Provider>
         </HashRouter>
     );
 };
 
 ReactDOM.render(<App />, document.getElementById('app'));
-
-/*fetch('https://tyrssbackend.herokuapp.com/').then((resp) => {
-    return resp.text();
-}).then((text) => {
-    console.log(text);
-}).catch((err) => {
-    console.error(err);
-});*/

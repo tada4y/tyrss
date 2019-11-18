@@ -5,24 +5,35 @@ const bodyStyle = css({
     padding: 0,
 });
 
-const naviStyle = css({
-    listStyleType: 'none',
-    margin: 0,
-    paddingLeft: 0,
+const containerStyle = css({
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
+});
+
+const naviStyle = css({
+    listStyleType: 'none',
+    width: 170,
+    margin: 0,
+    paddingLeft: 0,
     '& h1': {
         margin: 0,
-        paddingRight: 8,
         fontSize: 26
     },
     '& li': {
-        paddingRight: 8
+    }
+});
+
+const contentStyle = css({
+    width: '100%',
+    '& h2': {
+        margin: 0,
+        fontsize: 24,
     }
 });
 
 export {
     bodyStyle,
+    containerStyle,
     naviStyle,
+    contentStyle,
 };
