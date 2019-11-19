@@ -12,6 +12,7 @@ import {
     Switch
 } from 'react-router-dom';
 import { jsx } from '@emotion/core';
+import * as localforage from 'localforage';
 import { Store, Provider } from './store';
 import {
     naviStyle,
@@ -22,7 +23,11 @@ import {
 const Home = () => {
     return (
         <div className="container" css={contentStyle}>
-            <h2>Home</h2>
+            <div className="row">
+                <div className="col-sm-12">
+                    <h2>Home</h2>
+                </div>
+            </div>
         </div>
     );
 };
@@ -46,6 +51,7 @@ const Login = () => {
                 throw new Error(resp.statusText);
             }
         }).then((text) => {
+            localforage.setItem('token', text).catch((err) => console.error(err));
             dispatch({type: 'setUser', payload: text});
         }).catch((err) => console.error(err));
     };
@@ -54,9 +60,11 @@ const Login = () => {
     };
     let form = null;
     if (state.user) {
-        form = <div className="form-group">
+        form = <div className="col-sm-4">
+            <div className="form-group">
                 <button className="btn btn-primary" onClick={execLogout}>logout</button>
             </div>
+        </div>
     } else {
         form = <div className="col-sm-4">
             <div className="form-group">
@@ -90,8 +98,32 @@ const Login = () => {
     );
 };
 
+const Setting = () => {
+    return (
+        <div className="container" css={contentStyle}>
+            <div className="row">
+                <div className="col-sm-12">
+                    <h2>Setting</h2>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Navi = () => {
     const {state, dispatch} = useContext(Store);
+    let loadToken = () => {
+        localforage.getItem<string>('token').then((resp) => {
+            dispatch({type: 'setUser', payload: resp});
+        }).catch((err) => console.error(err));
+        loadToken = () => {};
+    };
+    useEffect(() => {
+        loadToken();
+        return () => {
+            loadToken = null;
+        };
+    }, []);
     console.log(state, dispatch);
     let login = null;
     if (state.user) {
@@ -110,7 +142,9 @@ const Navi = () => {
             <li>
                 <Link to="/login">{login}</Link>
             </li>
-            <li></li>
+            <li>
+                <Link to="/setting">Setting</Link>
+            </li>
         </ul>
     );
 };
@@ -127,6 +161,9 @@ const App = () => {
                         </Route>
                         <Route path="/login">
                             <Login />
+                        </Route>
+                        <Route path="/setting">
+                            <Setting />
                         </Route>
                     </Switch>
                 </div>
