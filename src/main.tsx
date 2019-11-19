@@ -3,7 +3,6 @@ import React, {
     useState, 
     useEffect, 
     useContext, 
-    useReducer
 } from 'react';
 import ReactDOM from 'react-dom';
 import {
@@ -12,7 +11,7 @@ import {
     Link,
     Switch
 } from 'react-router-dom';
-import { jsx, Global } from '@emotion/core';
+import { jsx } from '@emotion/core';
 import { Store, Provider } from './store';
 import {
     naviStyle,
@@ -22,7 +21,7 @@ import {
 
 const Home = () => {
     return (
-        <div css={contentStyle}>
+        <div className="container" css={contentStyle}>
             <h2>Home</h2>
         </div>
     );
@@ -55,33 +54,38 @@ const Login = () => {
     };
     let form = null;
     if (state.user) {
-        form = <React.Fragment>
-            <p>
-                <button onClick={execLogout}>logout</button>
-            </p>
-        </React.Fragment>
+        form = <div className="form-group">
+                <button className="btn btn-primary" onClick={execLogout}>logout</button>
+            </div>
     } else {
-        form = <React.Fragment>
-            <p>
-                <span>name</span><br/>
-                <input type="text" onChange={(ev) => {
+        form = <div className="col-sm-4">
+            <div className="form-group">
+                <label>name</label><br/>
+                <input className="form-control" type="text" onChange={(ev) => {
                     setName(ev.currentTarget.value);
                 }} value={name} />
-                <br/>
-                <span>password</span><br/>
-                <input type="password" onChange={(ev) => {
+            </div>
+            <div className="form-group">
+                <label>password</label><br/>
+                <input className="form-control" type="password" onChange={(ev) => {
                     setPass(ev.currentTarget.value);
                 }} value={pass} />
-            </p>
-            <p>
-                <button onClick={execLogin}>login</button>
-            </p>
-        </React.Fragment>
+            </div>
+            <div className="form-group">
+                <button className="btn btn-primary" onClick={execLogin}>login</button>
+            </div>
+        </div>
     }
     return (
-        <div css={contentStyle}>
-            <h2>Login/Logout</h2>
-            {form}
+        <div className="container" css={contentStyle}>
+            <div className="row">
+                <div className="col-sm-12">
+                    <h2>Login/Logout</h2>
+                </div>
+            </div>
+            <div className="row">
+                {form}
+            </div>
         </div>
     );
 };
@@ -115,7 +119,7 @@ const App = () => {
     return (
         <HashRouter>
             <Provider>
-                <div css={containerStyle}>
+                <div className="container" css={containerStyle}>
                     <Navi />
                     <Switch>
                         <Route exact path="/">
