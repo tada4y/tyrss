@@ -17,6 +17,10 @@ const reducer = (state: StoreType, action: any) => {
                     ...payload
                 ]
             });
+        case 'removeFeed':
+            return Object.assign({}, state, {
+                feed: [...state.feed.filter((e, idx) => idx !== action.payload)]
+            });
         default:
             return state;
     }
