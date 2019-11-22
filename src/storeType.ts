@@ -1,3 +1,4 @@
 export default interface StoreType {
-    user: any
+    user: any,
+    feed: string[],
 };

@@ -116,18 +116,26 @@ const Navi = () => {
         localforage.getItem<string>('token').then((resp) => {
             dispatch({type: 'setUser', payload: resp});
         }).catch((err) => console.error(err));
-        loadToken = () => {};
+    };
+    let loadFeed = () => {
+        localforage.getItem<string[]>('feed').then((resp) => {
+            dispatch({type: 'addFeeds', payload: resp});
+        }).catch((err) => console.error(err));
     };
     useEffect(() => {
         loadToken();
+        loadFeed();
         return () => {
             loadToken = null;
+            loadFeed = null;
         };
     }, []);
-    console.log(state, dispatch);
+    console.log(state);
     let login = null;
+    let setting = null;
     if (state.user) {
         login = 'Logout';
+        setting = <Link to="/setting">Setting</Link>
     } else {
         login = 'Login';
     }
@@ -143,7 +151,7 @@ const Navi = () => {
                 <Link to="/login">{login}</Link>
             </li>
             <li>
-                <Link to="/setting">Setting</Link>
+                {setting}
             </li>
         </ul>
     );

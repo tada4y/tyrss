@@ -3,15 +3,20 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, argv) => {
 
-    const IS_DEV = argv.mode === 'development';
+    const IS_DEV = argv.mode !== 'production';
 
     return {
+        mode: IS_DEV ? 'development' : 'production',
         entry: "./src/main.tsx",
         output: {
             filename: "bundle.js",
             path: path.join(__dirname, "public")
         },
         resolve: {
+            modules: [
+                'node_modules',
+                path.resolve('./src')
+            ],
             extensions: [".ts", ".tsx", ".js"]
         },
         module: {
@@ -26,21 +31,15 @@ module.exports = (env, argv) => {
                     ]
                 },
                 {
-                    test: /\.m?js$/,
-                    exclude: /node_modules/,
-                    use: [
-                        {
-                            loader: "babel-loader",
-                            options: {
-                                presets: ["@babel/preset-env"]
-                            }
-                        }
-                    ]
-                },
-                {
                     test: /\.js$/,
-                    use: ["source-map-loader"],
-                    enforce: "pre"
+                    use: [{
+                        loader: "source-map-loader",
+                        options: {
+                            enforce: "pre",
+                            presets: ['@babel/preset-env', '@abbel/preset-react']
+                        }
+                    }],
+                    exclude: '/node_modules/'
                 }
             ]
         },

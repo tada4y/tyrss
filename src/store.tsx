@@ -5,7 +5,8 @@ import reducer from './reducer';
 import StoreType from './storeType';
 
 const initState: StoreType = {
-    user: null
+    user: null,
+    feed: [],
 };
 
 const Store = React.createContext<{state: StoreType, dispatch: React.Dispatch<any>}>({
