@@ -20,13 +20,102 @@ import {
     containerStyle, 
     contentStyle,
 } from './styles';
+import { 
+    SET_USER, 
+    ADD_URL, 
+    REMOVE_URL, 
+    ADD_URLS, 
+    ADD_FEED,
+    CLEAR_FEEDS
+} from './actions';
+import { FeedType } from './storeType';
 
 const Home = () => {
+    const {state, dispatch} = useContext(Store);
+    const fetchXml = (rssUrl: string) => {
+        const url = 'https://tyrssbackend.herokuapp.com/rss';
+        return new Promise((resolve, reject) => {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                body: JSON.stringify({token: state.user, url: rssUrl})
+            }).then((resp) => {
+                if (resp.status === 200) {
+                    return resp.json()
+                } else {
+                    reject(new Error('response error'));
+                }
+            }).then((json) => {
+                resolve(json);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    };
+    const parseItems = (xml: any): FeedType[] => {
+        let items: FeedType[] = [];
+        if (xml.rss !== undefined) {
+            xml.rss.channel.item.map((e: any) => {
+                items.push({
+                    channel: xml.rss.channel.title["_text"],
+                    title: e.title["_text"],
+                    link: e.link["_text"],
+                    date: new Date(e.pubDate["_text"]),
+                });
+            });
+        } else if (xml["rdf:RDF"] !== undefined) {
+            xml["rdf:RDF"].item.map((e: any) => {
+                items.push({
+                    channel: xml["rdf:RDF"].channel.title["_text"],
+                    title: e.title["_text"],
+                    link: e.link["_text"],
+                    date: new Date(e["dc:date"]["_text"]),
+                });
+            });
+        }
+        return items;
+    };
+    useEffect(() => {
+        if (state.user) {
+            state.urls.forEach((e) => {
+                fetchXml(e).then((xml) => {
+                    const items = parseItems(xml);
+                    dispatch({type: ADD_FEED, payload: items});
+                }).catch((err) => {
+                    console.error(err);
+                });
+            });
+        }
+        return () => {
+            dispatch({type: CLEAR_FEEDS});
+        };
+    }, [state.urls]);
+    let feedItems: FeedType[] = [];
+    state.feeds.forEach((feed) => {
+        const ls = [...feedItems, ...feed.map((e) => e)];
+        feedItems = ls.sort((a, b) => a.date > b.date ? -1:0);
+    });
+    console.log(feedItems);
+    const items = feedItems.map((e, idx) => {
+        return (
+            <li key={idx}>
+                <a href={e.link}>
+                    <span>{e.title}</span>
+                </a>
+                <span>{e.channel}</span>
+            </li>
+        );
+    });
     return (
         <div className="container" css={contentStyle}>
             <div className="row">
                 <div className="col-sm-12">
                     <h2>Home</h2>
+                    <ul>
+                        {items}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -53,11 +142,11 @@ const Login = () => {
             }
         }).then((text) => {
             localforage.setItem('token', text).catch((err) => console.error(err));
-            dispatch({type: 'setUser', payload: text});
+            dispatch({type: SET_USER, payload: text});
         }).catch((err) => console.error(err));
     };
     const execLogout = () => {
-        dispatch({type: 'setUser', payload: null});
+        dispatch({type: SET_USER, payload: null});
     };
     let form = null;
     if (state.user) {
@@ -103,15 +192,15 @@ const Setting = () => {
     const [url, setUrl] = useState('');
     const {state, dispatch} = useContext(Store);
     const saveFeed = () => {
-        localforage.setItem('feed', state.feed).catch((err) => console.error(err));
+        localforage.setItem('feed', state.urls).catch((err) => console.error(err));
     };
     const execAdd = () => {
-        dispatch({type: 'addFeed', payload: url});
+        dispatch({type: ADD_URL, payload: url});
     };
     const execRemove = (idx: number) => {
-        dispatch({type: 'removeFeed', payload: idx});
+        dispatch({type: REMOVE_URL, payload: idx});
     };
-    let urls: ReactElement[] = state.feed.map((url, idx) => {
+    let urls: ReactElement[] = state.urls.map((url, idx) => {
         return (
             <li key={idx} className="list-group-item">
                 <div className="row align-items-center">
@@ -129,7 +218,7 @@ const Setting = () => {
     });
     useEffect(() => {
         saveFeed();
-    }, [state.feed])
+    }, [state.urls])
     return (
         <div className="container" css={contentStyle}>
             <div className="row">
@@ -170,7 +259,7 @@ const Navi = () => {
     };
     let loadFeed = () => {
         localforage.getItem<string[]>('feed').then((resp) => {
-            dispatch({type: 'addFeeds', payload: resp});
+            dispatch({type: ADD_URLS, payload: resp});
         }).catch((err) => console.error(err));
     };
     useEffect(() => {

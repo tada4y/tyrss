@@ -1,25 +1,34 @@
-import StoreType from './storeType';
+import { StoreType } from './storeType';
+import { SET_USER, ADD_URL, ADD_URLS, REMOVE_URL, ADD_FEED, CLEAR_FEEDS } from './actions';
 const reducer = (state: StoreType, action: any) => {
     switch (action.type) {
-        case 'setUser':
+        case SET_USER:
             return Object.assign({}, state, {
                 user: action.payload
             });
-        case 'addFeed':
+        case ADD_URL:
             return Object.assign({}, state, {
-                feed: [...state.feed, action.payload]
+                urls: [...state.urls, action.payload]
             });
-        case 'addFeeds':
+        case ADD_URLS:
             const payload = action.payload || [];
             return Object.assign({}, state, {
-                feed: [
-                    ...state.feed, 
+                urls: [
+                    ...state.urls, 
                     ...payload
                 ]
             });
-        case 'removeFeed':
+        case REMOVE_URL:
             return Object.assign({}, state, {
-                feed: [...state.feed.filter((e, idx) => idx !== action.payload)]
+                urls: [...state.urls.filter((e, idx) => idx !== action.payload)]
+            });
+        case ADD_FEED:
+            return Object.assign({}, state, {
+                feeds: [...state.feeds, action.payload]
+            });
+        case CLEAR_FEEDS:
+            return Object.assign({}, state, {
+                feeds: []
             });
         default:
             return state;

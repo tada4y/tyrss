@@ -2,11 +2,12 @@ import React, {
     useReducer
 } from 'react';
 import reducer from './reducer';
-import StoreType from './storeType';
+import { StoreType } from './storeType';
 
 const initState: StoreType = {
     user: null,
-    feed: [],
+    urls: [],
+    feeds: [],
 };
 
 const Store = React.createContext<{state: StoreType, dispatch: React.Dispatch<any>}>({
