@@ -9,6 +9,7 @@ interface FeedType {
     title: string;
     link: string;
     date: Date;
+    desc: string;
 }
 
 export {

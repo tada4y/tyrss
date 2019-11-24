@@ -19,6 +19,7 @@ import {
     naviStyle,
     containerStyle, 
     contentStyle,
+    feedItemStyle,
 } from './styles';
 import { 
     SET_USER, 
@@ -29,6 +30,25 @@ import {
     CLEAR_FEEDS
 } from './actions';
 import { FeedType } from './storeType';
+
+const FeedItem = ({item}: {item: FeedType}) => {
+    const [show, setShow] = useState(false);
+    const lst = item.desc.lastIndexOf('...');
+    return (
+        <li className="list-group-item" css={feedItemStyle} onClick={() => {
+            setShow(!show);
+        }}>
+            <div>
+                <span className="title">{item.title}</span>
+                <span className="channel">{item.channel}</span>
+                <br/>
+                <p className={show ? 'desc' : 'desc hide'}>
+                    {item.desc.substring(0, lst !== -1 ? lst : item.desc.length)}
+                </p>
+            </div>
+        </li>
+    );
+};
 
 const Home = () => {
     const {state, dispatch} = useContext(Store);
@@ -55,6 +75,7 @@ const Home = () => {
         });
     };
     const parseItems = (xml: any): FeedType[] => {
+        console.log(xml);
         let items: FeedType[] = [];
         if (xml.rss !== undefined) {
             xml.rss.channel.item.map((e: any) => {
@@ -63,6 +84,7 @@ const Home = () => {
                     title: e.title["_text"],
                     link: e.link["_text"],
                     date: new Date(e.pubDate["_text"]),
+                    desc: e.description ? e.description["_text"] : e.title["_text"],
                 });
             });
         } else if (xml["rdf:RDF"] !== undefined) {
@@ -72,6 +94,7 @@ const Home = () => {
                     title: e.title["_text"],
                     link: e.link["_text"],
                     date: new Date(e["dc:date"]["_text"]),
+                    desc: e.description ? e.description["_cdata"] || e.description["_text"] : e.title["_text"],
                 });
             });
         }
@@ -97,23 +120,15 @@ const Home = () => {
         const ls = [...feedItems, ...feed.map((e) => e)];
         feedItems = ls.sort((a, b) => a.date > b.date ? -1:0);
     });
-    console.log(feedItems);
     const items = feedItems.map((e, idx) => {
-        return (
-            <li key={idx}>
-                <a href={e.link}>
-                    <span>{e.title}</span>
-                </a>
-                <span>{e.channel}</span>
-            </li>
-        );
+        return <FeedItem key={idx} item={e} />
     });
     return (
         <div className="container" css={contentStyle}>
             <div className="row">
                 <div className="col-sm-12">
                     <h2>Home</h2>
-                    <ul>
+                    <ul className="list-group">
                         {items}
                     </ul>
                 </div>

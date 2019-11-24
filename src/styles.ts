@@ -28,8 +28,24 @@ const contentStyle = css({
     }
 });
 
+const feedItemStyle = css({
+    '& span.channel': {
+        color: 'gray',
+        fontSize: 14,
+        paddingLeft: 8,
+    },
+    '& p.desc': {
+        margin: 0,
+        padding: 8,
+    },
+    '& p.desc.hide': {
+        display: 'none',
+    }
+});
+
 export {
     containerStyle,
     naviStyle,
     contentStyle,
+    feedItemStyle,
 };
