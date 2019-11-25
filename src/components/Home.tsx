@@ -3,6 +3,7 @@ import React, {
     useState, useEffect, useContext
 } from 'react';
 import { jsx } from '@emotion/core';
+import * as localforage from 'localforage';
 import { Store } from '../store';
 import {
     contentStyle,
@@ -63,13 +64,64 @@ export default function Home() {
         }
         return items;
     };
+    const loadItems = (url: string): Promise<FeedType[] | null> => {
+        return new Promise((resolve, reject) => {
+            localforage.getItem('item').then((resp: any[]) => {
+                if (!resp) {
+                    resolve(null);
+                }
+                const result = resp.filter((e: any) => e.url === url);
+                if (result.length > 0) {
+                    resolve(result[0].items);
+                } else {
+                    resolve(null);
+                }
+            }).catch((err) => reject(err));
+        });  
+    };
+    const saveItems = (url: string, items: FeedType[]): Promise<Boolean> => {
+        let flag = false;
+        return new Promise((resolve, reject) => {
+            localforage.getItem('item').then((resp: any[]) => {
+                if (!resp) {
+                    resp = [];
+                }
+                const filtered = resp.filter((e: any) => e.url === url);
+                if (filtered.length > 0) {
+                    let target = filtered[0];
+                    items.forEach((item) => {
+                        const flted = target.items.filter((e: any) => item.link === e.link);
+                        if (flted.length === 0) {
+                            target.items.unshift(item);
+                            flag = true;
+                        }
+                    });
+                } else {
+                    resp.push({url, items});
+                }
+                return localforage.setItem('item', resp);
+            }).then(() => {
+                resolve(flag);
+            }).catch((err) => console.error(err));
+        });
+    };
     const showState = useState(true);
     useEffect(() => {
         if (state.user) {
             state.urls.forEach((e) => {
-                fetchXml(e).then((xml) => {
-                    const items = parseItems(xml);
-                    dispatch({type: ADD_FEED, payload: items});
+                let fetched: FeedType[] | null = null;
+                loadItems(e).then((resp) => {
+                    dispatch({type: ADD_FEED, payload: resp});
+                    return fetchXml(e);
+                }).then((xml) => {
+                    fetched = parseItems(xml);
+                    return saveItems(e, fetched);
+                }).then((result) => {
+                    if (result) {
+                        loadItems(e).then((resp) => {
+                            dispatch({type: ADD_FEED, payload: resp});
+                        }).catch((err) => console.error(err));
+                    }
                 }).catch((err) => {
                     console.error(err);
                 });

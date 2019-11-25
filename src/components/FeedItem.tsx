@@ -17,7 +17,6 @@ const FeedItem = ({item, state}: FeedItemType) => {
     const [flag, setFlag] = useState(false);
     const lst = item.desc.lastIndexOf('...');
     useEffect(() => {
-        console.log(flag);
         setShow(flag);
         return () => {
             setFlag(false);
