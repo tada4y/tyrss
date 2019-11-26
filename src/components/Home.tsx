@@ -111,7 +111,9 @@ export default function Home() {
             state.urls.forEach((e) => {
                 let fetched: FeedType[] | null = null;
                 loadItems(e).then((resp) => {
-                    dispatch({type: ADD_FEED, payload: resp});
+                    if (resp) {
+                        dispatch({type: ADD_FEED, payload: resp});
+                    }
                     return fetchXml(e);
                 }).then((xml) => {
                     fetched = parseItems(xml);

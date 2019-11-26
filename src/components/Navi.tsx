@@ -10,7 +10,7 @@ import {
     ADD_URLS,
 } from '../actions';
 import {
-    naviStyle,
+    naviStyle, naviContainerStyle,
 } from '../styles';
 
 export default function Navi() {
@@ -43,19 +43,23 @@ export default function Navi() {
         login = 'Login';
     }
     return (
-        <ul css={naviStyle}>
-            <li>
-                <h1>TYRss</h1>
-            </li>
-            <li>
-                <Link to="/">Home</Link>
-            </li>
-            <li>
-                <Link to="/login">{login}</Link>
-            </li>
-            <li>
-                {setting}
-            </li>
-        </ul>
+        <div css={naviContainerStyle}>
+            <ul css={naviStyle}>
+                <li>
+                    <h1>TYRss</h1>
+                </li>
+                <li>
+                    <Link to="/">Home</Link>
+                </li>
+                <li>
+                    <Link to="/login">{login}</Link>
+                </li>
+                <li>
+                    {setting}
+                </li>
+            </ul>
+            <ul css={naviStyle}>
+            </ul>
+        </div>
     );
 };

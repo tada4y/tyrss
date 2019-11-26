@@ -5,9 +5,12 @@ const containerStyle = css({
     flexDirection: 'row',
 });
 
+const naviContainerStyle = css({
+    width: 170,
+});
+
 const naviStyle = css({
     listStyleType: 'none',
-    width: 170,
     margin: 0,
     paddingLeft: 0,
     '& h1': {
@@ -45,6 +48,7 @@ const feedItemStyle = css({
 
 export {
     containerStyle,
+    naviContainerStyle,
     naviStyle,
     contentStyle,
     feedItemStyle,
