@@ -46,10 +46,15 @@ const feedItemStyle = css({
     }
 });
 
+const filterItemStyle = css({
+    overflowWrap: 'break-word'
+});
+
 export {
     containerStyle,
     naviContainerStyle,
     naviStyle,
     contentStyle,
     feedItemStyle,
+    filterItemStyle,
 };

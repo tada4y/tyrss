@@ -8,6 +8,7 @@ const initState: StoreType = {
     user: null,
     urls: [],
     feeds: [],
+    filter: [],
 };
 
 const Store = React.createContext<{state: StoreType, dispatch: React.Dispatch<any>}>({

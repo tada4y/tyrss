@@ -2,6 +2,7 @@ interface StoreType {
     user: any;
     urls: string[];
     feeds: FeedType[][];
+    filter: string[];
 };
 
 interface FeedType {

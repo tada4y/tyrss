@@ -7,10 +7,10 @@ import { jsx } from '@emotion/core';
 import * as localforage from 'localforage';
 import { Store } from '../store';
 import { 
-    ADD_URLS,
+    ADD_URLS, CLEAR_FILTER, ADD_FILTER,
 } from '../actions';
 import {
-    naviStyle, naviContainerStyle,
+    naviStyle, naviContainerStyle, filterItemStyle,
 } from '../styles';
 
 export default function Navi() {
@@ -42,6 +42,15 @@ export default function Navi() {
     } else {
         login = 'Login';
     }
+    let filter = state.urls.map((e, idx) => {
+        return (
+            <li key={idx} className="list-group-item" css={filterItemStyle} onClick={() => {
+                dispatch({type: ADD_FILTER, payload: e});
+            }}>
+                {e}
+            </li>
+        );
+    });
     return (
         <div css={naviContainerStyle}>
             <ul css={naviStyle}>
@@ -58,7 +67,12 @@ export default function Navi() {
                     {setting}
                 </li>
             </ul>
-            <ul css={naviStyle}>
+            <br/>
+            <ul css={naviStyle} className="list-group list-group-flush">
+                <li className="list-group-item" css={filterItemStyle} onClick={() => {
+                    dispatch({type: CLEAR_FILTER});
+                }}>all</li>
+                {filter}
             </ul>
         </div>
     );
